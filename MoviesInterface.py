@@ -5,22 +5,54 @@
 
 import boto3
 
-# boto3 uses the credentials configured via `aws configure` on EC2
-dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
-table = dynamodb.Table('Movies')
+# -------------------------------------------------------
+# Configuration — update REGION if your table is elsewhere
+# -------------------------------------------------------
+REGION = "us-east-1"
+TABLE_NAME = "Movies"
+
+def get_table():
+    """Return a reference to the DynamoDB Movies table."""
+    dynamodb = boto3.resource("dynamodb", region_name=REGION)
+    return dynamodb.Table(TABLE_NAME)
 
 def create_movie():
-    """
-    Prompt user for a Movie Title.
-    Add the movie to the database with the title and an empty Ratings list.
-    """
+    table = get_table()
+
+    movie_title = input("Title: ")
+    movie_genre = input("Genre: ")
+    movie_year = input("Year: ")
+    movie_ratings = input("Ratings: ")
+    movie = {'title' : movie_title, 'year' : movie_year, 'ratings' : movie_ratings, 'genre' : movie_genre}
+    table.put_item(Item = movie)
     print("creating a movie")
 
+def print_movie(movie):
+    print("Title: ", movie["Title"], end=" ")
+    print("Ratings: ", end=" ")
+    for rating in movie["Ratings"]:
+        print(rating, end=" ")
+    print("Year: ", movie["Year"], end=" ")
+    print("Genre: ", movie["Genre"], end=" ")
+    print()
+    
 def print_all_movies():
-    """
-    Display all movies in the database.
-    """
-    print("display all movies")
+    """Scan the entire Movies table and print each item."""
+    table = get_table()
+    
+    # scan() retrieves ALL items in the table.
+    # For large tables you'd use query() instead — but for our small
+    # dataset, scan() is fine.
+    response = table.scan()
+    items = response.get("Items", [])
+    
+    if not items:
+        print("No movies found. Make sure your DynamoDB table has data.")
+        return
+    
+    print(f"Found {len(items)} movie(s):\n")
+    for movie in items:
+        print_movie(movie)
 
 def update_rating():
     """
