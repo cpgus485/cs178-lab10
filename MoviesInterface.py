@@ -22,8 +22,9 @@ def create_movie():
     movie_title = input("Title: ")
     movie_genre = input("Genre: ")
     movie_year = input("Year: ")
-    movie_ratings = input("Ratings: ")
-    movie = {'title' : movie_title, 'year' : movie_year, 'ratings' : movie_ratings, 'genre' : movie_genre}
+    ratings_input = input("Ratings (space separated): ")
+    movie_ratings = [int(r) for r in ratings_input.split()]
+    movie = {'Title' : movie_title, 'Genre' : movie_genre, 'Ratings' : movie_ratings, 'Year' : movie_year}
     table.put_item(Item = movie)
     print("creating a movie")
 
