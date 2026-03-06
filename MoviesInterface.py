@@ -90,7 +90,7 @@ def query_movie():
     
     movie = response.get("Item")
 
-    if "ratings" not in movie:
+    if "Ratings" not in movie:
         print("movie has no ratings")
 
     ratings_list = movie["Ratings"]  # a normal Python list of numbers
